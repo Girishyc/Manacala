@@ -65,6 +65,8 @@
 (defun start-game ()
    (initialize-game)
    (print-board *game*))
+   
+   ;*******
   
   
   
