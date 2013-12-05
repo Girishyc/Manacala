@@ -1,4 +1,3 @@
-
 (defvar *game* nil )
 
 (defstruct player 
@@ -99,3 +98,17 @@
          	(win-status game))
     )
   ) 
+  
+ (defun decf-board(board-status position)
+  (setf (aref board-status position) (+ (aref board-status position) 1)))
+
+
+(defun player-move(game pit-position)
+  (let((board-status (player-board-status game))
+       (position pit-position)
+       (p 12))
+     (dotimes (j (aref board-status position))
+      (if (>= (- position 1) 0)
+          (decf-board board-status (decf position))
+        (decf-board board-status (decf p))))
+    (setf (aref board-status pit-position) 0))) 
