@@ -95,7 +95,7 @@
          		do
         		 (if  (not (= 0 (aref board-status k))) (setq goflag2 nil)))
          
-        	 (if ( and  goflag1 goflag2 )
+        	 (if ( or  goflag1 goflag2 )
          	(return T))
          	
     )
@@ -120,22 +120,22 @@
       (let ((pit-position 0))
       (terpri)
       
-      if(eq term 1)
+      (if(eq term 1)
       
-      (prog (princ "Player 1 Enter Your Move: ") 
-      (setq pit-position (read))
-      (player-move game pit-position) (setq term1 2))
+      (progn (princ "Player 1 Enter Your Move: ") 
+      (setq pit-position (- (read) 1))
+      (player-move game pit-position) (setq term 2) (print-board game ))
       
-      (prog (princ "Player 2 Enter Your Move: ") 
-      (setq pit-position (read))
-      (player-move game pit-position))))
+      (progn (princ "Player 2 Enter Your Move: ") 
+      (setq pit-position (+ (read) 5))
+      (player-move game pit-position) (setq term 1) (print-board game )))))
       
       
          
     
     (defun do-game (game)
-    	(do (num-actions 0 (+ 1 num-actions))
-    	   ((not (game-over-check game)) 
-    	   (win-status game)) 
-    	   (player-terms game)
-    	    ))
+    	(loop 
+    	   (if (not (game-over-check game)) 
+    	       (player-terms game)
+    	       (win-status game)) 
+    	   ))
