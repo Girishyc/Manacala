@@ -67,8 +67,11 @@
  	           (terpri)
  	           ))
  	           
-(defun start-game (n)
-   (initialize-game n)
+(defun start-game ()
+   (terpri)
+   (princ "Enter Pits Element Count :") 
+   (setq count (read))
+   (initialize-game count)
    (print-board *game*)
 )
    
