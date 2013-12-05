@@ -16,20 +16,20 @@
 )
 
 
-(defun initialize-game ()
+(defun initialize-game (n)
   (setf *game* (make-player 
-                :board-status (make-array 12 :initial-element 4) 
+                :board-status (make-array 12 :initial-element n) 
                 :player1 (make-player1 :score 0)
                 :player2 (make-player2 :score 0)
                 )	
-  ))
+  )
+)
   
  (defun print-board (game) 
    (let ((board-status (player-board-status game))
-;;; 	      (len (length board-status))
  	      (player1-score (player1-score  (player-player1  game)))
  	      (player2-score (player2-score  (player-player2  game)))
- 	      )
+ 	    )
  	      (terpri)
  	      
  	      (princ "----------***MANCALA GAME***----------")
@@ -42,29 +42,60 @@
  	      (princ "PLAYER1: " )
  	       	
  	       	 (dotimes (j (/ (length board-status) 2))
- 	           (princ (aref  board-status j))
- 	           (princ " | "))
+ 	            (princ (aref  board-status j))
+ 	            (princ " | ")
+ 	         )
+ 	 	  
  	 	  (terpri)
  	 	  (terpri)
  	 
- 	 (princ " P1-SCORE :") (princ player1-score) 
- 	 (princ "   ")
- 	 (princ " P2-SCORE :")(princ  player2-score)
+  	      (princ " P1-SCORE :") (princ player1-score) 
+ 	      (princ "   ")
+ 	      (princ " P2-SCORE :")(princ  player2-score)
  	 	  (terpri)
 	 	  (terpri) 	 
  	   	 
- 	   	 (princ "PLAYER2: " )
+ 	   	  (princ "PLAYER2: " )
  	 		
-			   (loop for k from (- (length board-status) 1) downto (/ (length board-status) 2)
+			(loop for k from (- (length board-status) 1) downto (/ (length board-status) 2)
 			   do
- 	           (princ (aref  board-status k))
- 	           (princ " | "))
+ 	            (princ (aref  board-status k))
+ 	            (princ " | ")
+ 	        )
 
  	           (terpri)
  	           (princ "_______________________________________")
  	           (terpri)
  	           ))
  	           
-(defun start-game ()
-   (initialize-game)
-   (print-board *game*))
+(defun start-game (n)
+   (initialize-game n)
+   (print-board *game*)
+)
+   
+(defun win-status (game)
+  (let  ((player1-score (player1-score  (player-player1  game)))
+ 	      (player2-score (player2-score  (player-player2  game)))
+ 	    )
+  	(cond (( eq player1-score player2-score)(prog (terpri) (princ "MATCH DRAW")))
+   		  (( < player1-score player2-score) (prog (terpri) (princ "PLAYER 2 WINS THE GAME")))
+          (( > player1-score player2-score) (prog (terpri) (princ "PLAYER 1 WINS THE GAME"))) 
+    )
+  )
+)
+  
+  (defun game-over-check (game)
+    (let ((board-status (player-board-status game))
+          (goflag t))
+          
+        	(dotimes (j (/ (length board-status) 2))
+         		(if  (not (= 0 (aref board-status j))) (setq goflag nil)))
+         
+        	(loop for k from (- (length board-status) 1) downto (/ (length board-status) 2)
+         		do
+        		 (if  (not (= 0 (aref board-status k))) (setq goflag nil)))
+         
+        	 (if ( eq  t goflag)
+         	(win-status game))
+    )
+  ) 
