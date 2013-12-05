@@ -1,5 +1,5 @@
 (defvar *game* nil )
-
+(defvar term 1)
 (defstruct player 
 		   board-status
            player1
@@ -85,17 +85,19 @@
   
   (defun game-over-check (game)
     (let ((board-status (player-board-status game))
-          (goflag t))
+          (goflag1 t)
+          (goflag2 t))
           
         	(dotimes (j (/ (length board-status) 2))
-         		(if  (not (= 0 (aref board-status j))) (setq goflag nil)))
+         		(if  (not (= 0 (aref board-status j))) (setq goflag1 nil)))
          
         	(loop for k from (- (length board-status) 1) downto (/ (length board-status) 2)
          		do
-        		 (if  (not (= 0 (aref board-status k))) (setq goflag nil)))
+        		 (if  (not (= 0 (aref board-status k))) (setq goflag2 nil)))
          
-        	 (if ( eq  t goflag)
-         	(win-status game))
+        	 (if ( and  goflag1 goflag2 )
+         	(return T))
+         	
     )
   ) 
   
@@ -112,3 +114,28 @@
           (decf-board board-status (decf position))
         (decf-board board-status (decf p))))
     (setf (aref board-status pit-position) 0))) 
+    
+    
+    (defun player-terms (game)
+      (let ((pit-position 0))
+      (terpri)
+      
+      (if(eq term 1)
+      
+      (progn (princ "Player 1 Enter Your Move: ") 
+      (setq pit-position (read))
+      (player-move game pit-position) (setq term 2) (print-board game ))
+      
+      (progn (princ "Player 2 Enter Your Move: ") 
+      (setq pit-position (read))
+      (player-move game pit-position) (setq term 1) (print-board game )))))
+      
+      
+         
+    
+    (defun do-game (game)
+    	(loop 
+    	   (if (not (game-over-check game)) 
+    	       (player-terms game)
+    	       (win-status game)) 
+    	   ))
