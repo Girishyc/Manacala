@@ -108,11 +108,10 @@
     (dotimes (j move-count)
       (if (>= (- pit-position 1) 0)
           (decf-board board-status (decf pit-position))
-        (decf-board board-status (decf p))))
-        (if (eq 1 (player-turn game))
-        (capture-stones game p)
+        (progn(setf pit-position 11)
+        (decf-board board-status pit-position))))
         (capture-stones game pit-position)
-      )))
+      ))
     
     
     (defun player-terms (game)
