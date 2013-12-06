@@ -102,13 +102,15 @@
 
 (defun player-move(game pit-position)
   (let((board-status (player-board-status game))
-       (position (aref pit-position))
+       (position pit-position)
        (p 12))
-     (dotimes (j (aref board-status position))
-      (if (>= (- position 1) 0)
-          (decf-board board-status (decf position))
+    (setf move-count (aref board-status pit-position))
+    (setf (aref board-status pit-position) 0)
+    (dotimes (j move-count)
+      (if (>= (- pit-position 1) 0)
+          (decf-board board-status (decf pit-position))
         (decf-board board-status (decf p))))
-    (setf (aref board-status pit-position) 0))) 
+    ))
     
     
     (defun player-terms (game)
