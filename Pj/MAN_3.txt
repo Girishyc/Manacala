@@ -146,7 +146,7 @@
           (if (and (>= end-position (/ (length board-status) 2)) (<= end-position (- (length board-status) 1)))
               (if (and (<= (aref board-status end-position) 3) (> (aref board-status end-position) 1) )
                   (progn (setf (player-player1-score game) (+ (aref board-status end-position) player1-score))
-                    (setf (aref board-status end-position) 0)(capture-stones game (- end-position 1)))
+                    (setf (aref board-status end-position) 0)(capture-stones game (+ end-position 1)))
                 )
             )
         (if (and (>= end-position 0)) (<= end-position (- (/ (length board-status) 2) 1))
