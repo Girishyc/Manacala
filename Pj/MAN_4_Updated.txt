@@ -161,8 +161,4 @@
         )))
         
         
-        (defun test(n)
-          (loop do 
-             (if ( <= n 5)
-                 (progn (decf n)(print n))
-                 (return T))))
+      
