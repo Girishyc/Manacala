@@ -9,6 +9,16 @@
   game-type 
 )
 
+(defun array-max (A)
+  (let ((n (length A))   
+       (max (aref A 0))
+       (index 0))
+    (dotimes (k n k)
+      	(setf max (max (aref A k) max)))
+     	  (dotimes (k n index)
+            (if(eq max (aref A k))
+              (setq index k) ))))
+
 (defun copy-array (array)
   (let* ((dimensions (array-dimensions array))
          (new-array (make-array dimensions)))
