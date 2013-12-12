@@ -5,16 +5,33 @@
 (defstruct player 
   board-status
   player1-score
-  computer-score
+  comp-player2-score
   turn
   game-type 
 )
+
+(defun copy-array (array)
+  (let* ((dimensions (array-dimensions array))
+         (new-array (make-array dimensions)))
+    (dotimes (i (array-total-size array))
+      (setf (row-major-aref new-array i)
+            (row-major-aref array i)))
+    new-array))
+    
+(defun copy-player (game)
+(let* ((new-structure (make-player)))
+(setf (player-board-status new-structure) (cp (player-board-status game))) 
+            (setf (player-player1-score new-structure) (player-player1-score game))
+            (setf (player-comp-player2-score new-structure) (player-comp-player2-score game))
+            (setf (player-turn new-structure) (player-turn game))
+            (setf (player-game-type new-structure) (player-game-type game))
+            new-structure))
 
 (defun initialize-game (n)
   (setf *game* (make-player 
                 :board-status (make-array 12 :initial-element n) 
                 :player1-score 0
-                :computer-score 0
+                :comp-player2-score 0
                 :turn 1
                 :game-type 1)
                 )        
@@ -23,7 +40,7 @@
  (defun print-board (game) 
    (let ((board-status (player-board-status game))
                (player1-score (player-player1-score game))
-               (computer-score (player-computer-score game))
+               (comp-player2-score (player-comp-player2-score game))
              )
                		(terpri)
 					(princ "----------***MANCALA GAME***----------")
@@ -45,10 +62,10 @@
                
                (if (eq 1 (player-game-type game))
                
-               (progn (princ " CMP-SCORE :")(princ  computer-score)(terpri)(terpri)          
+               (progn (princ " CMP-SCORE :")(princ  comp-player2-score)(terpri)(terpri)          
                (princ "COMPUTER: " ))
                       
-               (progn (princ " P2-SCORE :")(princ  computer-score)(terpri)(terpri)          
+               (progn (princ " P2-SCORE :")(princ  comp-player2-score)(terpri)(terpri)          
                (princ "PLAYER2 : " )))
                       
                           
@@ -76,17 +93,18 @@
    (terpri) 
    (setf total-score (* 12 count))
    (print-board *game*)
+   (play-game)
 )
    
    
    
 (defun win-status (game)
   (let  ((player1-score (player-player1-score game))
-               (computer-score (player-computer-score game))
+               (comp-player2-score (player-comp-player2-score game))
              )
-          (cond (( eq player1-score computer-score)(prog (terpri) (princ "MATCH DRAW")))
-                     (( < player1-score computer-score) (prog (terpri) (princ "COMPUTER WINS THE GAME")))
-          (( > player1-score computer-score) (prog (terpri) (princ "PLAYER 1 WINS THE GAME"))) 
+          (cond (( eq player1-score comp-player2-score)(prog (terpri) (princ "MATCH DRAW")))
+                     (( < player1-score comp-player2-score) (prog (terpri) (princ "COMPUTER WINS THE GAME")))
+          (( > player1-score comp-player2-score) (prog (terpri) (princ "PLAYER 1 WINS THE GAME"))) 
     )
   )
 )
@@ -104,7 +122,7 @@
                          (if  (not (= 0 (aref board-status k))) (setq goflag2 nil)))
                 
                  (if ( or ( > (player-player1-score game) ( / total-score  2)) 
-                             ( > (player-computer-score game) ( / total-score 2) ))
+                             ( > (player-comp-player2-score game) ( / total-score 2) ))
                              (setq goflag1  t))
          
                  (if ( or  goflag1 goflag2 )
@@ -172,7 +190,6 @@
 
     
     (defun play-game ()
-			
 			(loop do 
              (if (game-over-check *game*)
             	   (progn (win-status *game*)(return T))
@@ -183,7 +200,7 @@
     (let((turn (player-turn game))
          (board-status (player-board-status game))
          (player1-score (player-player1-score game))
-         (computer-score (player-computer-score game)))
+         (comp-player2-score (player-comp-player2-score game)))
       (if (eq turn 1)
           (if (and (>= end-position (/ (length board-status) 2)) (<= end-position (- (length board-status) 1)))
               (if (and (<= (aref board-status end-position) 3) (> (aref board-status end-position) 1) )
@@ -193,7 +210,7 @@
             )
         (if (and (>= end-position 0) (<= end-position (- (/ (length board-status) 2) 1)))
               (if (and (<= (aref board-status end-position) 3) (> (aref board-status end-position) 1) )
-                  (progn (setf (player-computer-score game) (+ (aref board-status end-position) computer-score))
+                  (progn (setf (player-comp-player2-score game) (+ (aref board-status end-position) comp-player2-score))
                     (setf (aref board-status end-position) 0) (capture-stones game (+ end-position 1)))
                 )
           )
