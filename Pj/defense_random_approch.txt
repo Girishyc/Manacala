@@ -150,7 +150,7 @@
       
       (progn 
       (setq pit-position (+ (next-best-move (player-board-status game)) 5))
-      (princ "Smarty Played its Move as : ") (princ mov)
+      (sleep 2)(princ "Smarty Played its Move as : ") (princ mov)
       (player-move game pit-position) (setf (player-turn game) 1) (print-board game )))
       
       )))
