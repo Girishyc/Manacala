@@ -20,7 +20,7 @@
     
 (defun copy-player (game)
 (let* ((new-structure (make-player)))
-(setf (player-board-status new-structure) (cp (player-board-status game))) 
+(setf (player-board-status new-structure) (copy-array (player-board-status game))) 
             (setf (player-player1-score new-structure) (player-player1-score game))
             (setf (player-comp-player2-score new-structure) (player-comp-player2-score game))
             (setf (player-turn new-structure) (player-turn game))

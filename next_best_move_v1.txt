@@ -9,17 +9,24 @@
   game-type 
 )
 
-(defun array-max (A)
-  (let ((n (length A))   
-       (max (aref A 0))
+(defun array-max (board scores-array)
+"Array-max function returns index (move) with highest possible score"
+  (let ((n (length scores-array))   
+       (max (aref scores-array 0))
        (index 0))
     (dotimes (k n k)
-      	(setf max (max (aref A k) max)))
-     	  (dotimes (k n index)
-            (if(eq max (aref A k))
-              (setq index k) ))))
+      	(setf max (max (aref scores-array k) max)))
+      	(if (eq max 0)
+      	     (setq index (next-best-move board))
+     	  (progn (dotimes (k n index)
+            (if(eq max (aref scores-array k))
+              (setq index k) )))) index ))
+              
+              
+              
 
 (defun copy-array (array)
+"Copy-array :function copy one array into other array"
   (let* ((dimensions (array-dimensions array))
          (new-array (make-array dimensions)))
     (dotimes (i (array-total-size array))
@@ -28,6 +35,7 @@
     new-array))
     
 (defun copy-player (game)
+" copy-player function copy game structure to temporary game structure in order to get best move"
 (let* ((new-structure (make-player)))
 (setf (player-board-status new-structure) (copy-array (player-board-status game))) 
             (setf (player-player1-score new-structure) (player-player1-score game))
@@ -35,8 +43,10 @@
             (setf (player-turn new-structure) (player-turn game))
             (setf (player-game-type new-structure) (player-game-type game))
             new-structure))
+            
 
 (defun initialize-game (n)
+"initialize-game: function initialize game structure with default  required values."
   (setf *game* (make-player 
                 :board-status (make-array 12 :initial-element n) 
                 :player1-score 0
@@ -47,16 +57,18 @@
   )
   
  (defun print-board (game) 
+ "print-board: function print manacala game board"
    (let ((board-status (player-board-status game))
                (player1-score (player-player1-score game))
                (comp-player2-score (player-comp-player2-score game))
              )
                                (terpri)
+                               (terpri)
                                         (princ "----------***MANCALA GAME***----------")
                                 (terpri)(princ "_______________________________________")
                                (terpri)(terpri)                                 
                
-               (princ "PLAYER1: " )
+               (princ "PLAYER1 : " )
                         
                      (dotimes (j (/ (length board-status) 2))
                      (princ (aref  board-status j))
@@ -87,7 +99,8 @@
                     ))
                     
 (defun start-game ()
-   
+ "start-game: funtion start manacala game"
+   (terpri)
    (princ "Enter Pits Element Count :") 
    (setq count (read))
    (initialize-game count)
@@ -99,7 +112,6 @@
    (terpri)
    (princ "CHOOSE OPTION : ")
    (setf (player-game-type *game*) (read))
-   (terpri) 
    (setf total-score (* 12 count))
    (print-board *game*)
    (play-game)
@@ -108,17 +120,20 @@
    
    
 (defun win-status (game)
+"win-status :function implement logic to get  winner  of mancala game  "
   (let  ((player1-score (player-player1-score game))
                (comp-player2-score (player-comp-player2-score game))
              )
-          (cond (( eq player1-score comp-player2-score)(prog (terpri) (princ "MATCH DRAW")))
-                     (( < player1-score comp-player2-score) (prog (terpri) (princ "COMPUTER WINS THE GAME")))
+          (cond (( eq player1-score comp-player2-score)(prog (terpri) (princ "GAME DRAW")))
+((< player1-score comp-player2-score) (prog (terpri) (if(eq (player-game-type game) 1) (princ "COMPUTER WINS THE GAME")
+         (princ "PLAYER 2 WINS THE GAME"))))
           (( > player1-score comp-player2-score) (prog (terpri) (princ "PLAYER 1 WINS THE GAME"))) 
     )
   )
 )
   
   (defun game-over-check (game)
+  "game-over-check:function check whether game is over or not after particular scenarios"
     (let ((board-status (player-board-status game))
           (goflag1 t)
           (goflag2 t))
@@ -161,6 +176,7 @@
     
     
     (defun player-terms (game)
+    "Player-terms: function  is to play moves based on moves selected by player or computer"
       (let ((pit-position 0))
       (terpri)
       
@@ -176,41 +192,40 @@
       (player-move game pit-position) (setf (player-turn game) 1) (print-board game ))
       
       (progn 
-      (setq pit-position (+ (next-best-move (player-board-status game)) 5))
-      (sleep 2)(princ "Smarty Played its Move as : ") (princ mov)
+      (setq pit-position (comp-best-move game 2))
+      (sleep 2)(princ "AI-COMPUTER Played its Move as : ") (princ (- pit-position 5))
       (player-move game pit-position) (setf (player-turn game) 1) (print-board game )))
       
       )))
       
       
-      (defun next-best-move (board-status)
-         (let ((move (random-in 1 6)))
-            (if (isEmpty board-status move )
-                  (next-best-move board-status)
-                  (setf mov move))))
+     
 
 
 (defun comp-best-move (game player-turn)
+"This function returns best move with highest possible score"
   (let((board-status (player-board-status game)))
-   (setf scores (make-array (length board-status)))    
+   (setf scores (make-array (length board-status) :initial-element 0))    
    (if (eq player-turn 2)
        (dotimes (j (/ (length board-status) 2))
          (progn(setf *game1* (copy-player game))
            (player-move *game1* (+ j (/ (length board-status) 2)))
-           (setf (aref scores (+ j (/ (length board-status) 2))) (player-comp-player2-score *game1*))
-           ))
-          scores)))
+           (setf (aref scores (+ j (/ (length board-status) 2))) (- (player-comp-player2-score *game1*) 
+           (player-comp-player2-score *game*)))
+           ))) (array-max  board-status scores)))
 
-(defun comp-best-move (game player-turn)
-  (let((board-status (player-board-status game)))
-    (setf scores (make-array (length board-status)))
-    (setf *game1* (copy-player game))
-   (if (eq player-turn 2)
-       (player-move *game1* 6)
-          *game1*)))
+
+	 (defun next-best-move (board-status)
+	  "This function select random move when all possible moves leads to same score"
+         (let ((move (random-in 6 11)))
+            (print "move:")(princ move)
+            (if (isEmpty board-status move )
+                  (next-best-move board-status)
+                   move )))
 
      (defun isEmpty (board move)
-        (if ( eq 0 (aref board ( + move 5)))
+     "This function checkes pits empty condition in order to select no empty pit for move"
+        (if ( eq 0 (aref board move ))
              T))
              
     (defun random-in (lo hi)
@@ -219,13 +234,15 @@
 
     
     (defun play-game ()
-                        (loop do 
+    "This function handles game play and over mechanism"
+        (loop do 
              (if (game-over-check *game*)
-                       (progn (win-status *game*)(return T))
-                   (player-terms *game*)
-                 )))    
+                    (progn (terpri)(win-status *game*)(return T))
+                    (player-terms *game*))))    
+
 
   (defun capture-stones(game end-position)
+  "Capture-stones: function is to handle capture rule logic  for manacala "
     (let((turn (player-turn game))
          (board-status (player-board-status game))
          (player1-score (player-player1-score game))
